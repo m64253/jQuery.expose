@@ -1,21 +1,25 @@
+/*global window, document, navigator, jQuery, alert, setTimeout */
 (function($){
 	
 	var $win = $(window),
-		$doc = $(document),
 		$tracked = $([]),
 		aRegions = [],
-		aCallbacks = [],
-		sExposeEventName = 'expose';
+		sExposeEventName = 'expose',
+		
+		// Methods
+		fExpose,
+		fInView,
+		fProcess;
 	
 	/**
-	 * Describe what this method does
+	 * Takes a selector/element and binds one time event listener for the expose event
 	 * @private
-	 * @param {jQuery-Collection-Object|String} mSelector Describe this parameter
-	 * @param {function} fCallback Describe this parameter
-	 * @returns Describe what it returns
+	 * @param {jQuery-Collection-Object|String} mSelector The targeted element(s)
+	 * @param {function} fCallback Function to call when the event fires
+	 * @returns jQuery object
 	 * @type jQuery-object
 	 */
-	function expose(mSelector, fCallback) {
+	fExpose = function(mSelector, fCallback) {
 		
 		if (!$.isFunction(fCallback)) {
 			throw 'jQuery.expose: No callback function provided';
@@ -23,27 +27,26 @@
 		
 		var $els = $(mSelector);
 		
-		$els.bind(sExposeEventName, fCallback);
+		$els.one(sExposeEventName, fCallback);
 		
 		return $;
-	}
-		
+	};
 		
 	/**
-	 * Loop watched items and trigger callback on those that are in view
+	 * Loop watched items and trigger event on those that are in view
+	 * @private
 	 */
-	function process() {
+	fProcess = function() {
 		
 		var oViewerRegion = $win.getRegion();
 		
 		$tracked.each(function(i, item){
-			inView(item, oViewerRegion, i);
-			// Trigger event
+			fInView(item, oViewerRegion, i);
 		});
-	}
+	};
 	
 	/**
-	 * Describe what this method does
+	 * Takes an element and checks if the is in view
 	 * @private
 	 * @param {DOMNode} item
 	 * @param {Object} oViewerRegion
@@ -51,7 +54,7 @@
 	 * @returns Checks if the supplied item is in view
 	 * @type Boolean
 	 */
-	function inView(item, oViewerRegion, i) {
+	fInView = function(item, oViewerRegion, i) {
 		
 		oViewerRegion = oViewerRegion || $win.getRegion();
 		
@@ -79,36 +82,36 @@
 			// Trigger event
 			setTimeout(function(){
 				$item.trigger(sExposeEventName);
-			}, 0)
+			}, 0);
 			
 			return true;
 		}
 		
 		return false;
-	}
+	};
 	
 	/**
 	 * On document:ready initalize
 	 */
 	$(function($){
 		// Listen for window resize events
-		$win.bind('resize', process);
+		$win.bind('resize', fProcess);
 		
 		// Listen for window scroll events
-		$win.bind('scroll', process);
+		$win.bind('scroll', fProcess);
 		
 		// Process
-		process();
+		fProcess();
 	});
 	
-		
+	
 	/**
 	 * Extend jQuery
 	 */
 	$.extend({ 
 		expose: function(mSelector, fCallback) {
 			$(function($){
-				expose(mSelector, fCallback);
+				fExpose(mSelector, fCallback);
 			});
 			return $;
 		}
@@ -119,7 +122,7 @@
 	 */
 	$.fn.extend({
 		onExpose: function(fCallback) {
-			expose(this, fCallback);
+			fExpose(this, fCallback);
 			return this;
 		}
 	});
@@ -131,7 +134,7 @@
 		expose: {
 			setup: function() {
 				
-				if (!inView(this)) {
+				if (!fInView(this)) {
 					$tracked = $tracked.add($(this));
 				}
 				
@@ -173,7 +176,7 @@
 	            oRegion2 = oCachedRegion || this.getRegion();
 
 	        if (el.tagName || (el.attr && el.attr('tagName'))) {
-	            oRegion1 = jQuery(el).getRegion();
+	            oRegion1 = $(el).getRegion();
 	        } else if (typeof(el) === 'object') {
 	            oRegion1 = el;
 	        } else {
@@ -197,7 +200,7 @@
 	 */
 	$.extend({
 		getViewportRegion: function() {
-			var $el = jQuery(window),
+			var $el = $(window),
 				iHeight = $el.height(),
 				iWidth = $el.width(),
 				scrollTop = $el.scrollTop(),
@@ -213,5 +216,5 @@
 			};
 		}
 	});
-	
-})(jQuery);
+		
+}(jQuery));

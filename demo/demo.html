@@ -1,0 +1,43 @@
+<!DOCTYPE html >
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<title>demo</title>
+	<style type="text/css" media="screen">
+		img {
+			float: left;
+			margin: 20px;
+		}
+		img.loading {
+			background: #eeeeee url('loader.gif') no-repeat center;
+		}
+	</style>
+</head>
+<body>
+
+<img src="blank.gif" expose-src="1.jpg" width="426" height="640" />
+<img src="blank.gif" expose-src="2.jpeg" width="640" height="427" />
+<img src="blank.gif" expose-src="3.jpeg" width="640" height="427" />
+<img src="blank.gif" expose-src="4.jpeg" width="640" height="427" />
+<img src="blank.gif" expose-src="5.jpeg" width="640" height="426" />
+<img src="blank.gif" expose-src="6.jpeg" width="426" height="640" />
+<img src="blank.gif" expose-src="7.jpeg" width="640" height="426" />
+<img src="blank.gif" expose-src="8.jpeg" width="640" height="308" />
+<img src="blank.gif" expose-src="9.jpeg" width="640" height="366" />
+<img src="blank.gif" expose-src="10.jpeg" width="640" height="371" />
+<img src="blank.gif" expose-src="11.jpeg" width="640" height="426" />
+<img src="blank.gif" expose-src="12.jpeg" width="640" height="426" />
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+<script src="../jquery.expose.js"></script>
+<script>
+	$('img').addClass('loading').onExpose(function(){	
+		var $img = $(this),
+			src = $img.attr('expose-src');
+		$img.removeClass('loading').attr('src', src);
+	});
+</script>
+
+</body>
+</html>
